@@ -239,7 +239,7 @@ function clearfield(f)
 
 </script>
 <br>
-<strong>BTC ONLY - NO SHICOINS</strong><br>
+<strong>BTC ONLY - NO SHITCOINS</strong><br>
 <input type=text id=btcaddress onclick=\"this.setSelectionRange(0, 99999); document.execCommand('copy'); document.getElementById('tmpinfo').innerHTML = 'Address copied'; clearfield('tmpinfo');\" value=\"" . $btcaddress . "\">
 <div id=tmpinfo>Click to copy the address</div>
 </div>";
