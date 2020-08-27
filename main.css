@@ -1,0 +1,48 @@
+BODY
+{ background-color: black; color: #dedede; font-size: 14px; font-family: arial, helvetica, sans-serif; padding: 40px; padding-top: 20px; line-height: 170%; }
+
+.title1
+{ color: hotpink; font-size: 36px; padding-bottom: 12px; }
+
+a:link
+{ color: hotpink; }
+
+a:visited
+{ color: hotpink; }
+
+a:hover
+{ color: red; }
+
+a:active
+{ color: white; }
+
+.setupform
+{
+padding: 12px; border: 1px dotted #333333;
+}
+
+#dbg
+{ position: fixed; font-family: courier-new, courier; color: #00cc00; width: 500px; height: 400px; background-color: #000000; opacity: 0.7; bottom: 20px; right: 20px; font-size: 11px; line-height: 120%; overflow-y: scroll; padding: 12px; border: 1px solid green; }
+
+#halp
+{ display: none; width: 600px; padding: 20px; line-height: 180%; font-family: verdana, Arial, Helvetica; font-size: 18px; text-align: left; }
+
+
+#container
+{
+border: 0px solid red; padding: 12px; background-color: white; width: 600px; color: black; font-size: 18px; line-height: 170%;
+}
+
+#header
+{ font-family: impact; font-weight: normal; font-size: 44px; padding-top: 20px; padding-bottom: 0px; color: black; height: 60px; }
+
+#bottomtext
+{}
+
+#btcaddress
+{ font-size: 24px; font-weight: bold; padding: 12px; width: 560px; text-align: center; }
+
+#tmpinfo
+{ font-size: 12px; color: #555555;}
+
+
