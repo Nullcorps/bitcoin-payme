@@ -220,7 +220,7 @@ echo "<script src=\"kjua-0.1.1.min.js\"></script>\n";
 echo "<center><div id=container style=\"\">";
 
 echo "<div id=header>Pay " . $vendor_name . " with Bitcoin</div>";
-echo "<center><div style=\"width: 420px; text-align: center;\"><div id=oink style=\"border: 1px solid black; background-color: #ffffff; width; 420px; height: 420px; padding-top: 0px; text-align: center;\"></div></div></center>\n";
+echo "<center><div style=\"width: 420px; text-align: center;\"><div id=oink style=\"\"></div></div></center>\n";
 echo "<script language-javascript>
 var url = '" . $btcaddress . "';
 //var opts = \"\";
