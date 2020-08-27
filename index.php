@@ -1,12 +1,18 @@
 <?php
 
+
+$dbg = false;  // << Change this to true to enable debug mode and complete setup.
+               // During setup, especially if some of your addresses are used,
+               // refresh the page a few times till it's cleaned out all the
+               // used addresses.
+
+
 $nl = "<br>\n";
 $filespath = "add";
 $arfresh = "";
 $arused = "";
 $addresses_to_generate = 100;          
 $api_preference = "blockchain.info"; // or blockchain.info
-$dbg = false;
 $vendor_name = "";
 $vendor_signature = "";
 
@@ -200,11 +206,15 @@ $btcaddress = get_fresh_address();
 if ($dbg) { echo "ADDRESS TO SEND TO: " . $btcaddress . $nl; }
 if ($dbg) { echo $nl; }
 
-if ($dbg) { echo "- throw up QR & rest of page" . $nl; }
+if ($dbg) { echo "- throw up QR & rest of page" . $nl . $nl; }
+
+if ($dbg) { echo "<div id=setupdone>Ok If you got to this point and you see the QR code, your name and signoff on the page you can turn debug mode off again now and you're all set :)<br><br></div>"; }
+
 echo "</div>";
 
 
-
+if (substr($btcaddress,0,5) <> "ERROR" && $vendor_name <> "" && $vendor_sig <> "")
+   {
 
 echo "<script src=\"kjua-0.1.1.min.js\"></script>\n";
 echo "<center><div id=container style=\"\">";
@@ -258,7 +268,14 @@ ANY OF THE OTHER SHITTY CLONES. THEY ARE *NOT* THE SAME. YOU'LL LOSE YOUR MONEY 
 SUPER PISSED OFF TOO SO JUST DON'T. ONLY BITCOIN/BTC<br><br>" . $vendor_sig . "<br>
 </div>
 <div style=\"padding: 20px\"><input id=halpbutton type=button value=\"CLICK ME IF YOU DONT KNOW WHAT TO DO WITH THIS PAGE\" style=\"font-family: verdana, arial; font-size: 16px; padding: 12px;\" onclick=\"document.getElementById('halp').style.display = 'block'; document.getElementById('halpbutton').style.display = 'none';\"></div>
-</center>
+</center>";
+   }
+else
+   {
+   echo "<div id=halp2>Setup is not complete, please enable debug mode, complete setup and then you'll be good to go :)</div>" . $nl;
+   }
+
+echo "
 </body>
 </html>";
 

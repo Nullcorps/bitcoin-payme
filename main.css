@@ -22,10 +22,13 @@ padding: 12px; border: 1px dotted #333333;
 }
 
 #dbg
-{ position: fixed; font-family: courier-new, courier; color: #00cc00; width: 500px; height: 400px; background-color: #000000; opacity: 0.7; bottom: 20px; right: 20px; font-size: 11px; line-height: 120%; overflow-y: scroll; padding: 12px; border: 1px solid green; }
+{ position: fixed; font-family: courier-new, courier; color: #00ff00; width: 500px; height: 400px; background-color: #000000; opacity: 0.8; bottom: 20px; right: 20px; font-size: 11px; line-height: 120%; overflow-y: scroll; padding: 12px; border: 1px solid green; }
 
 #halp
 { display: none; width: 600px; padding: 20px; line-height: 180%; font-family: verdana, Arial, Helvetica; font-size: 18px; text-align: left; }
+
+#halp
+{ width: 600px; padding: 20px; line-height: 180%; font-family: verdana, Arial, Helvetica; font-size: 18px; text-align: left; }
 
 
 #container
@@ -46,3 +49,5 @@ border: 0px solid red; padding: 12px; background-color: white; width: 600px; col
 { font-size: 12px; color: #555555;}
 
 
+#setupdone
+{ font-size: 18px; font-weight: bold; color: yellow; line-height: 120%; }
