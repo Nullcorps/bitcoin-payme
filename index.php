@@ -28,6 +28,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 ?>
 <html>
 <head>
+<title>Pay me with Bitcoin</title>
 <link rel="stylesheet" type="text/css" href="main.css">
 <style>
 
