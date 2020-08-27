@@ -23,6 +23,7 @@ TODO:
 =============================
 - something to refill addresses once running low
 - implement the blockstream api for balances too!
+- customisable footer message
 
 
 
