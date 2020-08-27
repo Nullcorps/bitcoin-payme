@@ -24,7 +24,7 @@ TODO:
 - something to refill addresses once running low
 - implement the blockstream api for balances too!
 - customisable footer message
-
+- settings file perhaps? somethign a bit more elegant than a bunch of textfiles
 
 
 Setup:
