@@ -19,12 +19,16 @@ If you want a payment page like this but don't have your own hosting, I'll be of
 er - I guess that's about it for the moment. Will be working on the "what happens when we run short of addresses" thing soon :)
 
 
+You can see how this page looks in practice here: https://swpay.me/donate/
+(payments will go towards supporting the project) 
+
+
 TODO:
 =============================
 - something to refill addresses once running low
 - implement the blockstream api for balances too!
 - customisable footer message
-- settings file perhaps? somethign a bit more elegant than a bunch of textfiles
+- settings file perhaps? something a bit more elegant than a bunch of textfiles
 
 
 Setup:
