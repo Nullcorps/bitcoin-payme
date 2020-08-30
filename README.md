@@ -38,7 +38,7 @@ Once you've cloned the repo to a web folder and can see the page it'll be saying
 
 That will let you do the setup procedure (enter your xpub, vendor name, vendor 'sig') and get you up and running.
 
-Once setup procedure is complete please set debug back to false as it exploses sensitive information (don't share your xpub!)
+Once setup procedure is complete please set debug back to false as it exposes sensitive information (don't share your xpub!)
 
 Needless to say it's probably a good idea to set up a separate hot wallet (short-term storage wallet) to handle these payments, and then move them to a private wallet or whatever from there (or to your Ca$happ, or exchange if you want to cash out to fiat.
 
