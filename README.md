@@ -28,6 +28,7 @@ TODO:
 - something to refill addresses once running low
 - implement the blockstream api for balances too!
 - customisable footer message
+- forgot the "back" link (to parent?)
 - settings file perhaps? something a bit more elegant than a bunch of textfiles
 
 
