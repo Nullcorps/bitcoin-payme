@@ -11,7 +11,7 @@ $nl = "<br>\n";
 $filespath = "add";
 $arfresh = "";
 $arused = "";
-$addresses_to_generate = 100;          
+$addresses_to_generate = 20;      // also counts as the number of addresses to keep in the "fresh" list    
 $api_preference = "blockchain.info"; // or blockchain.info
 $vendor_name = "";
 $vendor_signature = "";
@@ -39,7 +39,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 $showdbg = "none";
 
-if ($dbg) { $showdbg = "block"; }
+if ($dbg || 1==2) { $showdbg = "block"; }
 
 
 echo "<div id=dbg style=\"display: " . $showdbg . "\">";
@@ -53,7 +53,7 @@ if (file_exists($folder . "/xp.txt"))
    {
    if ($dbg) { echo "- xpub exists, carry on" . $nl; }
    $xpub = trim(file_get_contents($folder . "/xp.txt"));
-   if ($dbg) { echo "xpub retrieved, ending: " . substr($xpub,4,-4) . $nl; }
+   if ($dbg) { echo "xpub retrieved, ending: " . substr($xpub,-4,4) . $nl; }
    }
 else
    {
@@ -166,8 +166,13 @@ if ($dbg) { echo "- get the next address" . $nl; }
 
 if (file_exists($folder . "/fresh.txt"))
    {
-   //$tmp = file_get_contents($folder . "/fresh.txt");
-   //$arfresh = explode("\n",$tmp);
+   $tmp = file_get_contents($folder . "/fresh.txt");
+   $arfresh = explode("\n",trim($tmp));
+   if ($dbg) { echo "- Addresses in fresh stack: " . count($arfresh); }
+   if (count($arfresh) < $addresses_to_generate)
+      {
+      $generate_addresses = true;
+      }
    }
 else
    {
@@ -190,15 +195,20 @@ else
    
 if ($dbg) { echo $nl; }
 
+
+
+
+
    
 if ( $generate_addresses && $xpub <> "" )
    {
-   echo "<div class=setupform>";
-   echo "GENERATE ADDRESSES!" . $nl;
+   if ($dbg) { echo "<div class=setupform>"; }
+   echo "GENERATING ADDRESSES" . $nl;
    generate_addresses($xpub);
-   echo "</div>\n";      
+   if ($dbg) { echo "</div>\n"; }
    }
-echo $nl;
+   
+if ($dbg) { echo $nl; }
 
 
 if ($dbg) { echo "- - check the fresh addresses stack" . $nl; }
@@ -302,7 +312,7 @@ function get_fresh_address()
    if(file_exists($addpath))
       {
       $adds = file_get_contents($addpath);
-      $aradds = explode("\n",$adds);
+      $aradds = explode("\n",trim($adds));
       $cnt = 0;
       
       
@@ -315,7 +325,7 @@ function get_fresh_address()
          
          
          $tmpused = file_get_contents($folder . "/used.txt");
-         $artmpused = explode("\n",$tmpused);
+         $artmpused = explode("\n",trim($tmpused));
          
 
          if ( in_array($nextadd, $artmpused) )
@@ -344,12 +354,16 @@ function get_fresh_address()
             {
             if ($dbg) { echo "WRITE TO USED STACK" . $nl; }
             if ($dbg) { echo "Add the current address to the used addresses list" . $nl; }
-            file_put_contents($usedpath, $nextadd . "\n", FILE_APPEND | LOCK_EX);
-      
+            //file_put_contents($usedpath, $nextadd . "\n", FILE_APPEND | LOCK_EX);
+            mark_address_used($nextadd);
+            
+            
             $addsleft = str_replace($nextadd . "\n","", $adds);
+            $addsleft = str_replace($nextadd . "\n\n","", $adds);
+            $addsleft = str_replace($nextadd, "", $adds);
             //echo "Addresses left: " . $nl . $addsleft . $nl;
             if ($dbg) { echo "Writing remaining fresh addresses back to file" . $nl; }
-            file_put_contents($addpath, $addsleft);
+            //file_put_contents($addpath, $addsleft);
             
             }
          
@@ -438,6 +452,8 @@ function get_address_balance_bc($address, $confirmed)
    }
 
 
+
+
 function get_address_balance_bs($address, $confirmed)
    {
    global $nl;
@@ -473,10 +489,11 @@ function generate_addresses($xpub)
    {
    global $nl;
    global $addresses_to_generate;
+   global $dbg;
    
    $folder = get_files_folder();
-   echo "xpub: " . $xpub . $nl;
-   echo "files folder: " . $folder . $nl;
+   if ($dbg) { echo "xpub ending: " . substr($xpub,-4,4) . $nl; }
+   if ($dbg) { echo "files folder: " . $folder . $nl; }
    
    $math = Bitcoin::getMath();
    $network = Bitcoin::getNetwork();
@@ -490,8 +507,8 @@ function generate_addresses($xpub)
    //$master = $hdFactory->fromExtended("yourxpuborxprivhere");
    //$xpub = "";
    
-   echo "xpub passed in: " . $xpub . $nl;
-   echo  "Restoring from xpub ending " . substr($xpub, -4, 4) . $nl . $nl;
+   if ($dbg) { echo "xpub passed in: " . substr($xpub,0,4) . "..." . substr($xpub,-4,4) . $nl; }
+   //echo  "Restoring from xpub ending " . substr($xpub, -4, 4) . $nl . $nl; }
    $master = $hdFactory->fromExtended($xpub);
    $childKey = $master->derivePath('0/0');
    $pubKey = $childKey->getPublicKey();
@@ -501,45 +518,214 @@ function generate_addresses($xpub)
    
    $masterAddr = new PayToPubKeyHashAddress($master->getPublicKey()->getPubKeyHash());
  
-   echo "Directly derive path m/0/n stylee:" . $nl;
-   // maybe make the address derivation path user configurable? would perhaps improve
-   // compatibility with other wallets which might use different derivation paths?
+   if ($dbg) { echo "Directly derive path m/0/n stylee:" . $nl; }
    
-   //$sameKey2 = $master->derivePath("0/1");
-   //echo " - m/0/1 " . $sameKey2->toExtendedPublicKey() . $nl;
-   //$child3 = new PayToPubKeyHashAddress($sameKey2->getPublicKey()->getPubKeyHash());
-   //echo "   Address: " . $child3->getAddress() . $nl . $nl;
-   //
-   //
-   //$sameKey2 = $master->derivePath("0/2");
-   //echo " - m/0/1 " . $sameKey2->toExtendedPublicKey() . $nl;
-   //$child3 = new PayToPubKeyHashAddress($sameKey2->getPublicKey()->getPubKeyHash());
-   //echo "   Address: " . $child3->getAddress() . $nl . $nl;
-   //
-   //
-   //$sameKey2 = $master->derivePath("0/3");
-   //echo " - m/0/1 " . $sameKey2->toExtendedPublicKey() . $nl;
-   //$child3 = new PayToPubKeyHashAddress($sameKey2->getPublicKey()->getPubKeyHash());
-   //echo "   Address: " . $child3->getAddress() . $nl . $nl;
-   //
+   if ($dbg) { echo "Figure out the starting point m/0/?" . $nl; }
+   $freshpath = $folder . "/fresh.txt";
+   $usedpath = $folder . "/used.txt";
+   $lastfresh = "";
+   $fresh_cleaned = "";
+   $startat = 0;
+   $rollback = 5;
    
-   $addresses = "";
-   ob_flush();
+
+
+
+  
+   if ($dbg) { echo "- get the last address in the fresh addresses (if present)" . $nl; }
    
-   for ($n=0;$n<$addresses_to_generate;$n++)
+   if ( file_exists($freshpath) )
+      {   
+      $fresh = file_get_contents( $freshpath );
+      
+      $arfresh = explode("\n", trim($fresh));
+      if ($dbg) { echo "Fresh addresses found: " . count($arfresh) . $nl; }
+      $lastfresh = $arfresh[(count($arfresh)-1)];
+      if ($dbg) { echo "Last fresh address: " . $lastfresh . $nl; }
+      }
+   else
       {
-      $sameKey2 = $master->derivePath("0/".$n);
-      //echo " - m/0/" . $n . ": " . $sameKey2->toExtendedPublicKey() . $nl;
-      $child3 = new PayToPubKeyHashAddress($sameKey2->getPublicKey()->getPubKeyHash());
-      echo "   Address m/0/" . $n . ": " . $child3->getAddress() . $nl;
-      $addresses .= $child3->getAddress() . "\n";
-      ob_flush();
+      if ($dbg) { echo "No fresh addresses file, starting from scratch I guess" . $nl; }
       }
    
+   if ($dbg) { echo $nl; }
+   if ($dbg) { echo "- get an idea where to start looking for that address, and failing that, get the approx starting point from the used addresses (if it exists)" . $nl; }
    
-   echo "Saving addresses to text file.." . $nl;
+   if ( file_exists($usedpath) )
+      {
+      $used = file_get_contents( $usedpath );
+      $arused = explode("\n", trim($used));
+      $usedcount = count($arused);
+      if ($dbg) { echo "Used addresses found: " . $usedcount . $nl; }
+      }
+   else
+      {
+      if ($dbg) { echo "No used addresses file, starting from scratch I guess" . $nl; }
+      }
    
-   file_put_contents( $folder . "/fresh.txt", $addresses );
+   if ($dbg) { echo "- somehow decide where to start deriving...(roll back a bit to be sure?)" . $nl; }
+   
+   
+   $new_list = "";
+   
+   if ($lastfresh <> "" && $usedcount)
+      {
+      if ($dbg) { echo  "Ok so probably wanna start looking for lastfresh about " . $usedcount . " but roll back " . $rollback . " to be safe. " . $nl; }
+      $startat = $usedcount - $rollback;
+      if($startat < 0)
+         { $startat = 0; }
+      }
+   else
+      {
+      if ($dbg) { echo "Missing lastfresh or usedcount, likely missing files. Perhaps start over from 0." . $nl; }
+      $new_list = true;
+      $startat = 0;
+      }
+   
+   if ($dbg) { echo $nl; }
+   
+   if ($dbg) { echo  "Start deriving at: " . $startat . $nl; }
+   if ($dbg) { echo "Address cache min: " . $addresses_to_generate . $nl; }
+   
+
+
+
+
+   $addresses = "";
+
+
+   if ($new_list)
+      {
+      for ($n=$startat;$n<($startat+$addresses_to_generate);$n++)
+         {
+         $sameKey2 = $master->derivePath("0/".$n);
+         //echo " - m/0/" . $n . ": " . $sameKey2->toExtendedPublicKey() . $nl;
+         $child3 = new PayToPubKeyHashAddress($sameKey2->getPublicKey()->getPubKeyHash());
+         $add = $child3->getAddress();
+         if ($dbg) { echo "   Address m/0/" . $n . ": " . $add . $nl; }
+         $addresses .= $add . "\n";
+         }
+      if ($dbg) { echo "Check before writing:<br><pre>" . $addresses . "</pre>" . $nl; }
+      if ($dbg) { echo "Saving addresses to text file.." . $nl; }
+      
+      if ($dbg) { echo "- new addresses file" . $nl; }
+      file_put_contents( $freshpath, $addresses, LOCK_EX );
+      }
+   else
+      {
+      if ($dbg) { echo "Start at: " . $startat . $nl; }
+      for ($n=$startat;$n<($startat+50);$n++)
+         {
+         $sameKey2 = $master->derivePath("0/".$n);
+         //echo " - m/0/" . $n . ": " . $sameKey2->toExtendedPublicKey() . $nl;
+         $child3 = new PayToPubKeyHashAddress($sameKey2->getPublicKey()->getPubKeyHash());
+         $add = $child3->getAddress();
+         if ($dbg) { echo "   Address m/0/" . $n . ": " . $add; }
+         if ($add == $lastfresh)
+            {
+            if ($dbg) { echo " &lt;= THIS ONE" . $nl; }
+            $startat = $n+1;
+            break;
+            }
+         else
+            {
+            if ($dbg) { echo $nl; }
+            }
+         
+         $addresses .= $add . "\n";
+         }
+       
+      if ($dbg) { echo "Really start at: " . $startat . $nl; }
+      
+      if ($dbg) { echo "Address cache min: " . $addresses_to_generate . $nl; }
+      
+      
+      $fresh = file_get_contents( $freshpath );
+      $arfresh = explode("\n", trim($fresh));
+      $freshcount = count($arfresh);
+      if ($dbg) { echo "Freshcount: " . $freshcount . $nl; }
+      
+      
+      $adds_needed = 0;
+      
+      if ($freshcount > 0 && $freshcount < $addresses_to_generate)
+         { $adds_needed = $addresses_to_generate - $freshcount; }
+      
+      
+      if ($dbg) { echo "lastfresh: " . $lastfresh . $nl; }
+      
+      
+      if ($dbg) { echo "Addresses to generate: " . $adds_needed . $nl; }
+      
+      if ($adds_needed > 0)
+         {
+         $addresses = "";
+         for ($n=$startat; $n<($startat + $adds_needed); $n++)
+            {
+            $sameKey2 = $master->derivePath("0/".$n);
+            //echo " - m/0/" . $n . ": " . $sameKey2->toExtendedPublicKey() . $nl;
+            $child3 = new PayToPubKeyHashAddress($sameKey2->getPublicKey()->getPubKeyHash());
+            $add = $child3->getAddress();
+            if ($dbg) { echo "   Address m/0/" . $n . ": " . $add . $nl; }
+            if ($add == $lastfresh)
+               {
+               if ($dbg) { echo " ====== THIS ONE =====" . $nl; }
+               $startat = $n+2;
+               break;
+               }
+            $addresses .= $add . "\n";
+            }         
+         
+         if ($dbg) { echo "<pre>" . $addresses . "</pre>" . $nl; }
+         
+         file_put_contents( $freshpath, trim($addresses), FILE_APPEND | LOCK_EX );
+         }
+      else
+         {
+         if ($dbg) { echo "<b>No more addresses needed, you're good!</b>" . $nl; }
+         }
+      }
+   //$out .= "LOTS MORE CHECKING BEFORE SAVING";
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+   
+   
+   //$addresses = "";
+   //ob_flush();
+   //
+   //for ($n=0;$n<$addresses_to_generate;$n++)
+   //   {
+   //   $sameKey2 = $master->derivePath("0/".$n);
+   //   //echo " - m/0/" . $n . ": " . $sameKey2->toExtendedPublicKey() . $nl;
+   //   $child3 = new PayToPubKeyHashAddress($sameKey2->getPublicKey()->getPubKeyHash());
+   //   echo "   Address m/0/" . $n . ": " . $child3->getAddress() . $nl;
+   //   $addresses .= $child3->getAddress() . "\n";
+   //   ob_flush();
+   //   }
+   //
+   //
+   //echo "Saving addresses to text file..[DISABLED]" . $nl;
+   
+   //file_put_contents( $folder . "/fresh.txt", $addresses );
    echo "DONE!" . $nl;
    
    //echo "HARDENED PATH (disabled bc no privkeys)\n";
@@ -559,6 +745,84 @@ function generate_addresses($xpub)
 
 
 
+
+
+
+
+
+
+function mark_address_used($btcaddress)
+   {
+   global $nl;
+   global $dbg;
+   //$dbg = true;
+   if ($btcaddress <> "")
+      {}
+   else
+      {
+      return "ERROR: Missing address";
+      }
+   $folder = get_files_folder();
+   
+   if ($dbg) { echo "IN MARK ADDRESS USED" . $nl; }
+   
+   //$addpath = $folder . "/addresses_fresh.txt";
+   $usedpath = $folder . "/used.txt";
+   if ($dbg) { echo "Files path for addresses: " . $folder . $nl; }
+   
+   $used = file_get_contents($usedpath);
+   $tmp = strpos($used, $btcaddress);
+   
+   if ($tmp || $tmp === 0)
+      {
+      if ($dbg) { echo "Address exists in used stack already, ignore" . $nl; }
+      }
+   else
+      {
+      file_put_contents($usedpath, $btcaddress . "\n", FILE_APPEND | LOCK_EX);
+      }
+      
+   $freshpath = $folder . "/fresh.txt";
+   $fresh = "";
+   if ( file_exists($freshpath) )
+      { $fresh = file_get_contents($freshpath); }
+   
+   $s = strpos($fresh, $btcaddress);
+   if ($dbg) { echo "DOES ADDRESS STILL EXIST IN FRESH LIST?: " . $s .  $nl; }
+   if (!$s)
+      {
+      if ($dbg) { echo "YES IT DOES - FIXING!" . $nl; }
+      $fresh_updated = str_replace($btcaddress . "\n", "", $fresh);
+      $fresh_updated = str_replace($btcaddress, "", $fresh);
+      $fresh_updated = str_replace("\n\n", "\n", $fresh_updated);
+      //echo "Old text:<br><pre>" . $fresh . "</pre><br>" . $nl;
+      //echo "New text:<br><pre>" . $fresh_updated . "</pre><br>" . $nl;
+      file_put_contents($freshpath, trim($fresh_updated) . "\n" ); 
+      }
+   
+   
+   
+   //$arfresh = explode("\n",$fresh);
+   //$fresh_new = [];
+   //
+   //foreach ($arfresh as $tmp)
+   //   {
+   //   if (trim($tmp) <> "")
+   //      {
+   //      if ($btcaddress <> $tmp)
+   //         {
+   //         $fresh_new .= $tmp . "\n";
+   //         }
+   //      }
+   //   }
+   //
+   
+   //$tmp = str_replace($btcaddress . "\n", "", $fresh);
+   
+   //file_put_contents($freshpath, $fresh_new, LOCK_EX); 
+   
+   return "OK";
+   }
 
 
 
