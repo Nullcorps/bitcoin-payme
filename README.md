@@ -26,6 +26,7 @@ You can see how this page looks in practice here: https://swpay.me/donate/
 TODO:
 =============================
 - segwit issue! "HD key magic bytes do not match network magic bytes in " WTF??
+- if you mess up the permissions and end up without a ventor txt file it breaks
 - something to refill addresses once running low << ISN'T THIS DONE?
 - implement the blockstream api for balances too!
 - customisable footer message (single settings file?/serialised object?)
